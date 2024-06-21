@@ -103,13 +103,13 @@ func (h *LogrusHandler) Handle(rec slog.Record) error {
 	entry := h.logger.WithFields(fields)
 
 	switch rec.Level {
-	case slog.LevelDebug:
+	case slog.DebugLevel:
 		entry.Debug(rec.Message)
-	case slog.LevelInfo.Level():
+	case slog.InfoLevel.Level():
 		entry.Info(rec.Message)
-	case slog.LevelWarn:
+	case slog.WarnLevel:
 		entry.Warn(rec.Message)
-	case slog.LevelError:
+	case slog.ErrorLevel:
 		entry.Error(rec.Message)
 	}
 

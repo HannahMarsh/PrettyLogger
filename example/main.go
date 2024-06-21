@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/HannahMarsh/PrettyLogger"
 	"github.com/sirupsen/logrus"
-	"log/slog"
+	"golang.org/x/exp/slog"
 	"os"
 	"time"
 )
