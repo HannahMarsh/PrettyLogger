@@ -67,14 +67,14 @@ func parseWrappedError(str string) string {
 				if len(lines) >= 2 {
 					for _, line := range lines[1:] {
 						if strings.Contains(line, file) {
-							stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(line), message)
+							stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(line), message)
 							gotit = true
 							break
 						}
 					}
 				}
 				if !gotit {
-					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+					stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
 				}
 			}
 		} else {
@@ -82,16 +82,16 @@ func parseWrappedError(str string) string {
 			if len(lines) < 3 {
 				if len(lines) == 2 {
 					file := lines[1]
-					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+					stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
 				} else if len(lines) == 1 {
 					file := lines[0]
-					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+					stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
 				} else {
-					stack = stack + fmt.Sprintf("\t\t\t\t    - %s\n", message)
+					stack = stack + fmt.Sprintf("\t\t\t\t    → %s\n", message)
 				}
 			} else {
 				file := lines[2]
-				stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+				stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
 			}
 		}
 

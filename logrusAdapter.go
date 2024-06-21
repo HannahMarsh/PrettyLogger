@@ -59,7 +59,8 @@ func (h *LogrusHandler) Handle(rec slog.Record) error {
 	case slog.DebugLevel:
 		entry.Debug(rec.Message)
 	case slog.InfoLevel.Level():
-		entry.Info(rec.Message)
+		loc := getLocation(4)
+		entry.Info(fmt.Sprintf("%s → %s", loc, rec.Message))
 	case slog.WarnLevel:
 		entry.Warn(rec.Message)
 	case slog.ErrorLevel:
