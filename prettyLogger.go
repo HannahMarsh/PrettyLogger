@@ -96,6 +96,60 @@ func WrapError(err error, msg string) error {
 	return errs.Wrap(err, fmt.Sprintf("\n---\nfile=\"%s\" msg=\"%s\"", file, msg))
 }
 
+type stackTracer interface {
+	StackTrace() errs.StackTrace
+}
+
+func NewError(format string, a ...any) error {
+	err := fmt.Errorf(format, a...)
+	return withStackSkip(err, 1)
+}
+
+func withStackSkip(err error, skip int) error {
+	if err == nil {
+		return nil
+	}
+	pcs := make([]uintptr, 32)
+	n := runtime.Callers(skip+2, pcs)
+	pcs = pcs[:n]
+	return &withStack{
+		error: err,
+		stack: pcs,
+	}
+}
+
+type withStack struct {
+	error
+	stack []uintptr
+}
+
+func (w *withStack) StackTrace() errs.StackTrace {
+	frames := make([]errs.Frame, len(w.stack))
+	for i := range frames {
+		frames[i] = errs.Frame(w.stack[i])
+	}
+	return frames
+}
+
+func (w *withStack) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 'v':
+		if s.Flag('+') {
+			fmt.Fprintf(s, "%+v", w.error)
+			for _, pc := range w.stack {
+				f := errs.Frame(pc)
+				fmt.Fprintf(s, "\n%+v", f)
+			}
+			return
+		}
+		fallthrough
+	case 's':
+		fmt.Fprint(s, w.error.Error())
+	case 'q':
+		fmt.Fprintf(s, "%q", w.error.Error())
+	}
+}
+
 func wrapError(err error, msg string) error {
 	file := getLocation(5)
 	return errs.Wrap(err, fmt.Sprintf("\n---\nfile=\"%s\" msg=\"%s\"", file, msg))
