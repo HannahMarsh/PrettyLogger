@@ -1,35 +1,20 @@
 package main
 
 import (
-	"errors"
 	"github.com/HannahMarsh/PrettyLogger"
-	"github.com/sirupsen/logrus"
+	"github.com/HannahMarsh/PrettyLogger/example/pkg"
 	"golang.org/x/exp/slog"
-	"os"
-	"time"
 )
 
 func main() {
 
-	logrus.SetFormatter(&PrettyLogger.ColoredFormatter{TimestampFormat: time.RFC3339})
-	logrus.SetOutput(os.Stdout)
+	PrettyLogger.InitDefault()
 
-	// integrate Logrus with the slog logger
-	slog.New(PrettyLogger.NewLogrusHandler(logrus.StandardLogger()))
+	err2 := pkg.F3()
 
-	err := f2()
-	if err != nil {
+	slog.Error("main error", err2)
+	slog.Info("main info", "info", "info")
+	slog.Warn("main warn", "warn", "warn")
+	slog.Debug("main debug", "debug", "debug")
 
-		PrettyLogger.PrintError(err, "main message")
-	}
-
-}
-
-func f1() error {
-	return errors.New("f1 error")
-}
-
-func f2() error {
-	err := f1()
-	return PrettyLogger.WrapError(err, "f2 message")
 }
