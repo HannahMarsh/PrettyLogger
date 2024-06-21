@@ -63,11 +63,18 @@ func parseWrappedError(str string) string {
 			if strings.Contains(file, "\" msg=\"") {
 				message := strings.TrimSuffix(strings.Split(" "+file, "\" msg=\"")[1], "\"")
 				file = strings.TrimSuffix(strings.Split(file, "\" msg=\"")[0], "\"")
-				for _, line := range lines[1:] {
-					if strings.Contains(line, file) {
-						stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(line), message)
-						break
+				gotit := false
+				if len(lines) >= 2 {
+					for _, line := range lines[1:] {
+						if strings.Contains(line, file) {
+							stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(line), message)
+							gotit = true
+							break
+						}
 					}
+				}
+				if !gotit {
+					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
 				}
 			}
 		} else {
