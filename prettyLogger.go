@@ -73,8 +73,15 @@ func parseWrappedError(str string) string {
 		} else {
 			message := lines[0]
 			if len(lines) < 3 {
-				file := lines[1]
-				stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+				if len(lines) == 2 {
+					file := lines[1]
+					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+				} else if len(lines) == 1 {
+					file := lines[0]
+					stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
+				} else {
+					stack = stack + fmt.Sprintf("\t\t\t\t    - %s\n", message)
+				}
 			} else {
 				file := lines[2]
 				stack = stack + fmt.Sprintf("\t\t\t\t    - %s  %s\n", getRelativePath(file), message)
