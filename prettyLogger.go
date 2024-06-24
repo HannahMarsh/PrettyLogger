@@ -99,7 +99,7 @@ func parseWrappedError(str string) string {
 }
 func WrapError(err error, format string, a ...any) error {
 	if err == nil {
-		return withStackSkip(fmt.Errorf(format, a...), 1)
+		return withStackSkip(fmt.Errorf(format, a...), 2)
 	}
 	msg := fmt.Sprintf(format, a...)
 	file := getLocation(2)
@@ -108,6 +108,10 @@ func WrapError(err error, format string, a ...any) error {
 
 type stackTracer interface {
 	StackTrace() errs.StackTrace
+}
+
+func LogNewError(format string, a ...any) {
+	slog.Error("", withStackSkip(fmt.Errorf(format, a...), 2))
 }
 
 func NewError(format string, a ...any) error {
