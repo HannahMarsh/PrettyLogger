@@ -60,7 +60,15 @@ func (h *LogrusHandler) Handle(rec slog.Record) error {
 		entry.Debug(rec.Message)
 	case slog.InfoLevel.Level():
 		loc := getLocation(4)
-		entry.Info(fmt.Sprintf("%s → %s", loc, rec.Message))
+		if len(fields) > 0 {
+			str := ""
+			for k, v := range fields {
+				str = str + fmt.Sprintf("%s=%v, ", k, v)
+			}
+			entry.Info(fmt.Sprintf("%s → %s, %s", loc, rec.Message, str))
+		} else {
+			entry.Info(fmt.Sprintf("%s → %s", loc, rec.Message))
+		}
 	case slog.WarnLevel:
 		entry.Warn(rec.Message)
 	case slog.ErrorLevel:
