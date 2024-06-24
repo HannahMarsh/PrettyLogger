@@ -12,14 +12,13 @@ import (
 	"time"
 )
 
-func InitDefault() {
+func SetUpLogrusAndSlog(logLevel string) {
 	logrus.SetFormatter(&ColoredFormatter{TimestampFormat: time.RFC3339})
 	logrus.SetOutput(os.Stdout)
-	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(ConvertLogLevel(logLevel))
 
 	// integrate Logrus with the slog logger
 	slog.SetDefault(slog.New(NewLogrusHandler(logrus.StandardLogger())))
-
 }
 
 // logErrorWithStack logs an Error with a stack trace.

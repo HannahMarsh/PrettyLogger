@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	PrettyLogger.InitDefault()
+	PrettyLogger.SetUpLogrusAndSlog()
 
 	err2 := pkg.F3()
 
