@@ -98,7 +98,11 @@ func parseWrappedError(str string) string {
 	}
 	return stack
 }
-func WrapError(err error, msg string) error {
+func WrapError(err error, format string, a ...any) error {
+	if err == nil {
+		return withStackSkip(fmt.Errorf(format, a...), 1)
+	}
+	msg := fmt.Sprintf(format, a...)
 	file := getLocation(2)
 	return errs.Wrap(err, fmt.Sprintf("\n---\nfile=\"%s\" msg=\"%s\"", file, msg))
 }
