@@ -6,6 +6,7 @@ package PrettyLogger
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -62,8 +63,16 @@ func (h *LogrusHandler) Handle(rec slog.Record) error {
 		loc := getLocation(4)
 		if len(fields) > 0 {
 			str := ""
-			for k, v := range fields {
-				str = str + fmt.Sprintf("%s=%v, ", k, v)
+			// Step 1: Extract the keys from the map
+			keys := make([]string, 0, len(fields))
+			for key, _ := range fields {
+				keys = append(keys, key)
+			}
+			// Step 2: Sort the keys
+			sort.Strings(keys)
+
+			for _, k := range keys {
+				str = str + fmt.Sprintf("%s=%v, ", k, fields[k])
 			}
 			entry.Info(fmt.Sprintf("%s → %s, %s", loc, rec.Message, str))
 		} else {
