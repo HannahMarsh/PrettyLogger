@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/HannahMarsh/PrettyLogger"
 	"github.com/HannahMarsh/PrettyLogger/example/pkg"
@@ -40,5 +41,10 @@ func main() {
 	e.FuncA(4, "examplestring")
 
 	FuncB(5, "examplestring")
+
+	_, err := base64.StdEncoding.DecodeString("test string")
+	if err != nil {
+		slog.Error("error decoding string", err)
+	}
 
 }

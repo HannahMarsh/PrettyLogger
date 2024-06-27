@@ -39,15 +39,20 @@ func getLocation(skip int) (file string) {
 
 func getRelativePath(absPath string) string {
 	absPath = strings.TrimSpace(absPath)
-	i := strings.LastIndex(absPath, ":")
-	path := absPath[:i]
-	line := absPath[i+1:]
-	if workingDir, e1 := os.Getwd(); e1 != nil {
-		return absPath
-	} else if relativePath, e2 := filepath.Rel(workingDir, path); e2 != nil {
-		return absPath
+	if strings.Contains(absPath, ":") {
+
+		i := strings.LastIndex(absPath, ":")
+		path := absPath[:i]
+		line := absPath[i+1:]
+		if workingDir, e1 := os.Getwd(); e1 != nil {
+			return absPath
+		} else if relativePath, e2 := filepath.Rel(workingDir, path); e2 != nil {
+			return absPath
+		} else {
+			return relativePath + ":" + line
+		}
 	} else {
-		return relativePath + ":" + line
+		return ""
 	}
 }
 
