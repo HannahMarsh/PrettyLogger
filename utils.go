@@ -19,6 +19,7 @@ func GetFuncName(params ...interface{}) string {
 	}
 
 	fnName := fn.Name()
+	//fnName = "github.com/HannahMarsh/pi_t-experiment/internal/api/api_functions.SendOnion"
 	spl := strings.Split(fnName, ".")
 	if len(spl) > 2 {
 		fnName = fmt.Sprintf("%s.%s", spl[len(spl)-2], spl[len(spl)-1])
@@ -26,6 +27,11 @@ func GetFuncName(params ...interface{}) string {
 	fnName = strings.ReplaceAll(fnName, "(", "")
 	fnName = strings.ReplaceAll(fnName, ")", "")
 	fnName = strings.ReplaceAll(fnName, "*", "")
+
+	if strings.Contains(fnName, "/") {
+		splf := strings.Split(fnName, "/")
+		fnName = splf[len(splf)-1]
+	}
 
 	paramStr := getParametersAsString(params...)
 
