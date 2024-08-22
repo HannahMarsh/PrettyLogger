@@ -4,9 +4,10 @@ import (
 	"fmt"
 	errs "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/slog"
+	"log/slog"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"time"
@@ -88,8 +89,13 @@ func parseWrappedError(str string) string {
 					file := lines[1]
 					stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
 				} else if len(lines) == 1 {
-					file := lines[0]
-					stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", getRelativePath(file), message)
+					//file := lines[0]
+					file := getRelativePath(lines[0])
+					if file == "" {
+						stack = stack + fmt.Sprintf("\t\t\t\t    → %s\n", message)
+					} else {
+						stack = stack + fmt.Sprintf("\t\t\t\t    → %s  %s\n", file, message)
+					}
 				} else {
 					stack = stack + fmt.Sprintf("\t\t\t\t    → %s\n", message)
 				}
@@ -135,6 +141,41 @@ func withStackSkip(err error, skip int) error {
 		error: err,
 		stack: pcs,
 	}
+}
+
+func interfaceToString(field interface{}) string {
+	paramStr := ""
+	if field == nil {
+		paramStr = "nil"
+	} else {
+		paramValue := reflect.ValueOf(field)
+		paramType := reflect.TypeOf(field)
+
+		if paramType.Kind() == reflect.String {
+			paramStr = fmt.Sprintf("%q", paramValue.Interface())
+		} else {
+			val := reflect.ValueOf(paramValue.Interface())
+			// Check if the value is a pointer, and get the element it points to
+			if val.Kind() == reflect.Ptr {
+				val = val.Elem()
+			}
+
+			// Ensure the value is a struct
+			if val.Kind() == reflect.Struct {
+				typ := val.Type()
+
+				members := make([]string, val.NumField())
+				for j := 0; j < val.NumField(); j++ {
+					value := interfaceToString(val.Field(j).Interface())
+					members[j] = fmt.Sprintf("%s:%v", Italic(ColorGrey(typ.Field(j).Name)), value)
+				}
+				paramStr = fmt.Sprintf("%s{%s}", ColorGrey(typ.Name()), strings.Join(members, ", "))
+			} else {
+				paramStr = fmt.Sprintf("%v", paramValue.Interface())
+			}
+		}
+	}
+	return paramStr
 }
 
 type withStack struct {

@@ -31,34 +31,86 @@ func (f *ColoredFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 func getColorByLevel(level logrus.Level) func(string) string {
 	switch level {
 	case logrus.DebugLevel:
-		return colorCyan
+		return ColorCyan
 	case logrus.InfoLevel:
-		return colorGreen
+		return ColorGreen
 	case logrus.WarnLevel:
-		return colorYellow
+		return ColorYellow
 	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		return colorRed
+		return ColorRed
 	default:
-		return colorWhite
+		return ColorGrey
 	}
 }
 
-func colorCyan(s string) string {
-	return fmt.Sprintf("\033[36m%s\033[0m", s)
-}
-
-func colorGreen(s string) string {
-	return fmt.Sprintf("\033[32m%s\033[0m", s)
-}
-
-func colorYellow(s string) string {
-	return fmt.Sprintf("\033[33m%s\033[0m", s)
-}
-
-func colorRed(s string) string {
+func ColorRed(s string) string {
 	return fmt.Sprintf("\033[31m%s\033[0m", s)
 }
 
-func colorWhite(s string) string {
+func ColorBrightRed(s string) string {
+	return fmt.Sprintf("\033[91m%s\033[0m", s)
+}
+
+func ColorYellow(s string) string {
+	return fmt.Sprintf("\033[33m%s\033[0m", s)
+}
+
+func ColorBrightYellow(s string) string {
+	return fmt.Sprintf("\033[93m%s\033[0m", s)
+}
+
+func ColorGreen(s string) string {
+	return fmt.Sprintf("\033[32m%s\033[0m", s)
+}
+
+func ColorBrightGreen(s string) string {
+	return fmt.Sprintf("\033[92m%s\033[0m", s)
+}
+
+func ColorCyan(s string) string {
+	return fmt.Sprintf("\033[36m%s\033[0m", s)
+}
+
+func ColorBrightCyan(s string) string {
+	return fmt.Sprintf("\033[96m%s\033[0m", s)
+}
+
+func ColorBlue(s string) string {
+	return fmt.Sprintf("\033[34m%s\033[0m", s)
+}
+
+func ColorBrightBlue(s string) string {
+	return fmt.Sprintf("\033[94m%s\033[0m", s)
+}
+
+func ColorPurple(s string) string {
+	return fmt.Sprintf("\033[35m%s\033[0m", s) // Pink/magenta color
+}
+
+func ColorPink(s string) string {
+	return fmt.Sprintf("\033[95m%s\033[0m", s)
+}
+
+func ColorBrightWhite(s string) string {
+	return fmt.Sprintf("\033[97m%s\033[0m", s)
+}
+
+func ColorGrey(s string) string {
 	return fmt.Sprintf("\033[37m%s\033[0m", s)
+}
+
+func ColorBlack(s string) string {
+	return fmt.Sprintf("\033[90m%s\033[0m", s)
+}
+
+func Bold(s string) string {
+	return fmt.Sprintf("\033[1m%s\033[0m", s) // Bold text
+}
+
+func Italic(s string) string {
+	return fmt.Sprintf("\033[3m%s\033[0m", s) // Italic text
+}
+
+func Underline(s string) string {
+	return fmt.Sprintf("\033[4m%s\033[0m", s) // Underlined text
 }

@@ -5,12 +5,13 @@ package PrettyLogger
 // https://thedevelopercafe.com/articles/logging-in-go-with-slog-a7bb489755c2
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	"sort"
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/slog"
 )
 
 type LogrusHandler struct {
@@ -42,27 +43,33 @@ func ConvertLogLevel(level string) logrus.Level {
 	return l
 }
 
-func (h *LogrusHandler) Enabled(_ slog.Level) bool {
+//func (h *LogrusHandler) Enabled(_ slog.Level) bool {
+//	// support all logging levels
+//	return true
+//}
+
+func (h *LogrusHandler) Enabled(_ context.Context, _ slog.Level) bool {
 	// support all logging levels
 	return true
 }
 
-func (h *LogrusHandler) Handle(rec slog.Record) error {
+func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 	fields := make(map[string]interface{}, rec.NumAttrs())
 
-	rec.Attrs(func(a slog.Attr) {
+	rec.Attrs(func(a slog.Attr) bool {
 		fields[a.Key] = a.Value.Any()
+		return true // continue iteration
 	})
 
 	entry := h.logger.WithFields(fields)
 
-	switch rec.Level {
-	case slog.DebugLevel:
-		entry.Debug(rec.Message)
-	case slog.InfoLevel.Level():
+	printMsg := ""
+
+	if rec.Level != slog.LevelError {
+		fnName := Italic(ColorPurple(GetFuncNameWithSkip(4)))
 		loc := getLocation(4)
 		if len(fields) > 0 {
-			str := ""
+			//str := ""
 			// Step 1: Extract the keys from the map
 			keys := make([]string, 0, len(fields))
 			for key, _ := range fields {
@@ -71,30 +78,45 @@ func (h *LogrusHandler) Handle(rec slog.Record) error {
 			// Step 2: Sort the keys
 			sort.Strings(keys)
 
-			for _, k := range keys {
-				str = str + fmt.Sprintf("%s=%v, ", k, fields[k])
+			vars := make([]string, len(keys))
+
+			for i, k := range keys {
+				paramStr := interfaceToString(fields[k])
+
+				vars[i] = fmt.Sprintf("%s=%s", Italic(ColorCyan(k)), Bold(paramStr))
+				//str = str + fmt.Sprintf("%s=%v, ", k, fields[k])
 			}
-			entry.Info(fmt.Sprintf("%s → %s, %s", loc, rec.Message, str))
+			str := strings.Join(vars, ", ")
+			printMsg = fmt.Sprintf("%s (%s) → %s | %s", loc, fnName, ColorBrightWhite(rec.Message), str)
 		} else {
-			entry.Info(fmt.Sprintf("%s → %s", loc, rec.Message))
+			printMsg = fmt.Sprintf("%s (%s) → %s", loc, fnName, ColorBrightWhite(rec.Message))
 		}
-	case slog.WarnLevel:
-		entry.Warn(rec.Message)
-	case slog.ErrorLevel:
+	}
+
+	switch rec.Level {
+	case slog.LevelDebug:
+		entry.Debug(printMsg)
+	case slog.LevelInfo:
+		entry.Info(printMsg)
+	case slog.LevelWarn:
+		entry.Warn(printMsg)
+	case slog.LevelError:
 		//stack := ""
 		b := false
-		for k, v := range fields {
-			if k == "err" {
-				if e, ok := v.(error); ok {
-					ee := wrapError(e, rec.Message)
-					str := fmt.Sprintf("%+v", ee)
-					ew := parseWrappedError(str)
-					ew = strings.TrimSpace(ew)
-					i := strings.Index(ew, "\n")
-					entry.Error(ew[:i] + "\n" + ew[i+1:])
-					b = true
-				}
+
+		for _, v := range fields {
+			//if k == "err" {
+			if e, ok := v.(error); ok {
+				ee := wrapError(e, rec.Message)
+				str := fmt.Sprintf("%+v", ee)
+				ew := parseWrappedError(str)
+				ew = strings.TrimSpace(ew)
+				i := strings.Index(ew, "\n")
+				fmt.Println()
+				entry.Error(ColorRed(ew[:i]) + "\n" + ew[i+1:] + "\n")
+				b = true
 			}
+			//}
 		}
 		if !b {
 			entry.Error(rec.Message)
