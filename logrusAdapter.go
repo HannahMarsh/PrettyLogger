@@ -10,6 +10,8 @@ import (
 	"log/slog"
 	"sort"
 	"strings"
+	"sync"
+	"sync/atomic"
 
 	"github.com/sirupsen/logrus"
 )
@@ -53,6 +55,25 @@ func (h *LogrusHandler) Enabled(_ context.Context, _ slog.Level) bool {
 	return true
 }
 
+var functionNames sync.Map
+var colorFuncs = []func(string) string{
+	ColorBrightBlue,
+	ColorPurple,
+	ColorPink,
+	ColorBrightCyan,
+	ColorBrightYellow,
+	ColorBrightGreen,
+}
+var index int64
+
+func getFuncNameWithColor(name string) string {
+	if formattedName, l := functionNames.Load(name); l {
+		return formattedName.(string)
+	}
+	formattedName, _ := functionNames.LoadOrStore(name, colorFuncs[int(atomic.AddInt64(&index, 1)-1)%len(colorFuncs)](name))
+	return formattedName.(string)
+}
+
 func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 	fields := make(map[string]interface{}, rec.NumAttrs())
 
@@ -66,7 +87,7 @@ func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 	printMsg := ""
 
 	if rec.Level != slog.LevelError {
-		fnName := Italic(ColorPurple(GetFuncNameWithSkip(4)))
+		fnName := Italic(getFuncNameWithColor(GetFuncNameWithSkip(4)))
 		loc := getLocation(4)
 		if len(fields) > 0 {
 			//str := ""
@@ -87,9 +108,9 @@ func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 				//str = str + fmt.Sprintf("%s=%v, ", k, fields[k])
 			}
 			str := strings.Join(vars, ", ")
-			printMsg = fmt.Sprintf("%s (%s) → %s | %s", loc, fnName, ColorBrightWhite(rec.Message), str)
+			printMsg = fmt.Sprintf("%s (%s) → %s | %s", loc, fnName, rec.Message, str)
 		} else {
-			printMsg = fmt.Sprintf("%s (%s) → %s", loc, fnName, ColorBrightWhite(rec.Message))
+			printMsg = fmt.Sprintf("%s (%s) → %s", loc, fnName, rec.Message)
 		}
 	}
 

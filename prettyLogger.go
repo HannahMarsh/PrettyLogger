@@ -152,7 +152,7 @@ func interfaceToString(field interface{}) string {
 		paramType := reflect.TypeOf(field)
 
 		if paramType.Kind() == reflect.String {
-			paramStr = fmt.Sprintf("%q", paramValue.Interface())
+			paramStr = fmt.Sprintf("%s", paramValue.Interface())
 		} else {
 			val := reflect.ValueOf(paramValue.Interface())
 			// Check if the value is a pointer, and get the element it points to
@@ -164,10 +164,13 @@ func interfaceToString(field interface{}) string {
 			if val.Kind() == reflect.Struct {
 				typ := val.Type()
 
-				members := make([]string, val.NumField())
+				members := make([]string, 0)
 				for j := 0; j < val.NumField(); j++ {
-					value := interfaceToString(val.Field(j).Interface())
-					members[j] = fmt.Sprintf("%s:%v", Italic(ColorGrey(typ.Field(j).Name)), value)
+					inter := val.Field(j)
+					if inter.CanInterface() {
+						value := interfaceToString(inter.Interface())
+						members = append(members, fmt.Sprintf("%s:%v", Italic(ColorGrey(typ.Field(j).Name)), value))
+					}
 				}
 				paramStr = fmt.Sprintf("%s{%s}", ColorGrey(typ.Name()), strings.Join(members, ", "))
 			} else {
