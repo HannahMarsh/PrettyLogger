@@ -30,9 +30,9 @@ func ConvertLogLevel(level string) logrus.Level {
 	var l logrus.Level
 
 	switch strings.ToLower(level) {
-	case "Error":
+	case "error":
 		l = logrus.ErrorLevel
-	case "warm":
+	case "warn":
 		l = logrus.WarnLevel
 	case "info":
 		l = logrus.InfoLevel
