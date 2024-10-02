@@ -8,10 +8,11 @@ import (
 
 type ColoredFormatter struct {
 	TimestampFormat string
+	LogLevel        string
 }
 
 func (f *ColoredFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	levelColor := getColorByLevel(entry.Level)
+	levelColor := f.getColorByLevel(entry.Level)
 	timestamp := entry.Time.Format(f.TimestampFormat)
 
 	message := fmt.Sprintf("%s %-18s %s\n",
@@ -28,89 +29,177 @@ func (f *ColoredFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(message), nil
 }
 
-func getColorByLevel(level logrus.Level) func(string) string {
+func (f *ColoredFormatter) getColorByLevel(level logrus.Level) func(string) string {
 	switch level {
 	case logrus.DebugLevel:
-		return ColorCyan
+		return f.ColorCyan
 	case logrus.InfoLevel:
-		return ColorGreen
+		return f.ColorGreen
 	case logrus.WarnLevel:
-		return ColorYellow
+		return f.ColorYellow
 	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		return ColorRed
+		return f.ColorRed
 	default:
-		return ColorGrey
+		return f.ColorGrey
 	}
 }
 
-func ColorRed(s string) string {
-	return fmt.Sprintf("\033[31m%s\033[0m", s)
+func (f *ColoredFormatter) ColorRed(s string) string {
+	if f.LogLevel == "debug" {
+		return fmt.Sprintf("\033[31m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightRed(s string) string {
-	return fmt.Sprintf("\033[91m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightRed(s string) string {
+	if f.LogLevel == "debug" {
+		return fmt.Sprintf("\033[91m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorYellow(s string) string {
-	return fmt.Sprintf("\033[33m%s\033[0m", s)
+func (f *ColoredFormatter) ColorYellow(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[33m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightYellow(s string) string {
-	return fmt.Sprintf("\033[93m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightYellow(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[93m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorGreen(s string) string {
-	return fmt.Sprintf("\033[32m%s\033[0m", s)
+func (f *ColoredFormatter) ColorGreen(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[32m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightGreen(s string) string {
-	return fmt.Sprintf("\033[92m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightGreen(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[92m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorCyan(s string) string {
-	return fmt.Sprintf("\033[36m%s\033[0m", s)
+func (f *ColoredFormatter) ColorCyan(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[36m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightCyan(s string) string {
-	return fmt.Sprintf("\033[96m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightCyan(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[96m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBlue(s string) string {
-	return fmt.Sprintf("\033[34m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBlue(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[34m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightBlue(s string) string {
-	return fmt.Sprintf("\033[94m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightBlue(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[94m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorPurple(s string) string {
-	return fmt.Sprintf("\033[35m%s\033[0m", s) // Pink/magenta color
+func (f *ColoredFormatter) ColorPurple(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[35m%s\033[0m", s) // Pink/magenta color
+	} else {
+		return s
+	}
 }
 
-func ColorPink(s string) string {
-	return fmt.Sprintf("\033[95m%s\033[0m", s)
+func (f *ColoredFormatter) ColorPink(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[95m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBrightWhite(s string) string {
-	return fmt.Sprintf("\033[97m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBrightWhite(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[97m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorGrey(s string) string {
-	return fmt.Sprintf("\033[37m%s\033[0m", s)
+func (f *ColoredFormatter) ColorGrey(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[37m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func ColorBlack(s string) string {
-	return fmt.Sprintf("\033[90m%s\033[0m", s)
+func (f *ColoredFormatter) ColorBlack(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[90m%s\033[0m", s)
+	} else {
+		return s
+	}
 }
 
-func Bold(s string) string {
-	return fmt.Sprintf("\033[1m%s\033[0m", s) // Bold text
+func (f *ColoredFormatter) Bold(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[1m%s\033[0m", s) // Bold text
+	} else {
+		return s
+	}
 }
 
-func Italic(s string) string {
-	return fmt.Sprintf("\033[3m%s\033[0m", s) // Italic text
+func (f *ColoredFormatter) Italic(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[3m%s\033[0m", s) // Italic text
+	} else {
+		return s
+	}
 }
 
-func Underline(s string) string {
-	return fmt.Sprintf("\033[4m%s\033[0m", s) // Underlined text
+func (f *ColoredFormatter) Underline(s string) string {
+	if f.LogLevel == "debug" {
+
+		return fmt.Sprintf("\033[4m%s\033[0m", s) // Underlined text
+	} else {
+		return s
+	}
 }

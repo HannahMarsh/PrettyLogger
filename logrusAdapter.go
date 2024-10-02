@@ -57,12 +57,12 @@ func (h *LogrusHandler) Enabled(_ context.Context, _ slog.Level) bool {
 
 var functionNames sync.Map
 var colorFuncs = []func(string) string{
-	ColorBrightBlue,
-	ColorPurple,
-	ColorPink,
-	ColorBrightCyan,
-	ColorBrightYellow,
-	ColorBrightGreen,
+	cf.ColorBrightBlue,
+	cf.ColorPurple,
+	cf.ColorPink,
+	cf.ColorBrightCyan,
+	cf.ColorBrightYellow,
+	cf.ColorBrightGreen,
 }
 var index int64
 
@@ -87,7 +87,7 @@ func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 	printMsg := ""
 
 	if rec.Level != slog.LevelError {
-		fnName := Italic(getFuncNameWithColor(GetFuncNameWithSkip(4)))
+		fnName := cf.Italic(getFuncNameWithColor(GetFuncNameWithSkip(4)))
 		loc := getLocation(4)
 		if len(fields) > 0 {
 			//str := ""
@@ -104,7 +104,7 @@ func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 			for i, k := range keys {
 				paramStr := interfaceToString(fields[k])
 
-				vars[i] = fmt.Sprintf("%s=%s", Italic(ColorCyan(k)), Bold(paramStr))
+				vars[i] = fmt.Sprintf("%s=%s", cf.Italic(cf.ColorCyan(k)), cf.Bold(paramStr))
 				//str = str + fmt.Sprintf("%s=%v, ", k, fields[k])
 			}
 			str := strings.Join(vars, ", ")
@@ -134,7 +134,7 @@ func (h *LogrusHandler) Handle(ctx context.Context, rec slog.Record) error {
 				ew = strings.TrimSpace(ew)
 				i := strings.Index(ew, "\n")
 				fmt.Println()
-				entry.Error(ColorRed(ew[:i]) + "\n" + ew[i+1:] + "\n")
+				entry.Error(cf.ColorRed(ew[:i]) + "\n" + ew[i+1:] + "\n")
 				b = true
 			}
 			//}

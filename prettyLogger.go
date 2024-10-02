@@ -13,8 +13,11 @@ import (
 	"time"
 )
 
+var cf *ColoredFormatter = &ColoredFormatter{TimestampFormat: time.RFC3339, LogLevel: "info"}
+
 func SetUpLogrusAndSlog(logLevel string) {
-	logrus.SetFormatter(&ColoredFormatter{TimestampFormat: time.RFC3339})
+	cf = &ColoredFormatter{TimestampFormat: time.RFC3339, LogLevel: logLevel}
+	logrus.SetFormatter(cf)
 	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(ConvertLogLevel(logLevel))
 
@@ -169,10 +172,10 @@ func interfaceToString(field interface{}) string {
 					inter := val.Field(j)
 					if inter.CanInterface() {
 						value := interfaceToString(inter.Interface())
-						members = append(members, fmt.Sprintf("%s:%v", Italic(ColorGrey(typ.Field(j).Name)), value))
+						members = append(members, fmt.Sprintf("%s:%v", cf.Italic(cf.ColorGrey(typ.Field(j).Name)), value))
 					}
 				}
-				paramStr = fmt.Sprintf("%s{%s}", ColorGrey(typ.Name()), strings.Join(members, ", "))
+				paramStr = fmt.Sprintf("%s{%s}", cf.ColorGrey(typ.Name()), strings.Join(members, ", "))
 			} else {
 				paramStr = fmt.Sprintf("%v", paramValue.Interface())
 			}
